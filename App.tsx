@@ -12,7 +12,9 @@ import {
   FlatList,
   Animated,
   Easing,
-  Image
+  Image,
+  ActivityIndicator,
+  Alert
 } from 'react-native';
 
 // Import StayScreen component
@@ -41,258 +43,6 @@ const FLAGS = {
   'LHR': '🇬🇧',
   'CDG': '🇫🇷',
 };
-
-// Flight data from JSON
-const FLIGHT_DATA = [
-  {
-    "IndividualDay": "Mon, 01Apr",
-    "Date": "2025-04-01",
-    "FT_BLH": "05:55",
-    "FDT": "07:55",
-    "DT": "08:25",
-    "RP": "17:30",
-    "Flights": [
-      {
-        "Duty": "CAI8001",
-        "CheckIn": "03:45",
-        "CheckOut": null,
-        "Departure": "SOF",
-        "Arrival": "WAW",
-        "DepTime": "04:45",
-        "ArrivalTime": "07:45",
-        "Aircraft": "A320/BHL",
-        "Cockpit": "TRI G.GOSPODINOV; COP US R. BERNARDO",
-        "Cabin": "SEN CCM S.ZHEKOVA; INS CCM A.IVANOVA; CCM K.KALOYANOV"
-      },
-      {
-        "Duty": "CAI8002",
-        "CheckIn": null,
-        "CheckOut": "12:10",
-        "Departure": "WAW",
-        "Arrival": "AYT",
-        "DepTime": "08:30",
-        "ArrivalTime": "10:45",
-        "Aircraft": "A320/BHL",
-        "Cockpit": "TRI G.GOSPODINOV; COP US R. BERNARDO",
-        "Cabin": "SEN CCM S.ZHEKOVA; CCM 2 Y.BOEVA; CCM M.ANDREEV"
-      }
-    ]
-  },
-  {
-    "IndividualDay": "Tue, 02Apr",
-    "Date": "2025-04-02",
-    "FT_BLH": "06:10",
-    "FDT": "08:00",
-    "DT": "08:40",
-    "RP": "18:00",
-    "Flights": [
-      {
-        "Duty": "CAI8011",
-        "CheckIn": "04:00",
-        "CheckOut": null,
-        "Departure": "SOF",
-        "Arrival": "FRA",
-        "DepTime": "05:00",
-        "ArrivalTime": "07:15",
-        "Aircraft": "B737/ATR",
-        "Cockpit": "CAPT L.KOSTADINOVA; FO A.PETROV",
-        "Cabin": "SEN CCM M.IVANOVA; CCM 2 P.DIMITROV"
-      },
-      {
-        "Duty": "CAI8012",
-        "CheckIn": null,
-        "CheckOut": "13:00",
-        "Departure": "FRA",
-        "Arrival": "SOF",
-        "DepTime": "08:00",
-        "ArrivalTime": "10:10",
-        "Aircraft": "B737/ATR",
-        "Cockpit": "CAPT L.KOSTADINOVA; FO A.PETROV",
-        "Cabin": "SEN CCM M.IVANOVA; CCM 2 P.DIMITROV"
-      }
-    ]
-  },
-  {
-    "IndividualDay": "Wed, 03Apr",
-    "Date": "2025-04-03",
-    "Duty": "Day Off"
-  },
-  {
-    "IndividualDay": "Thu, 04Apr",
-    "Date": "2025-04-04",
-    "FT_BLH": "06:05",
-    "FDT": "08:10",
-    "DT": "08:40",
-    "RP": "16:00",
-    "Flights": [
-      {
-        "Duty": "CAI8031",
-        "CheckIn": "04:15",
-        "CheckOut": null,
-        "Departure": "SOF",
-        "Arrival": "LHR",
-        "DepTime": "05:15",
-        "ArrivalTime": "07:20",
-        "Aircraft": "A320/BHL",
-        "Cockpit": "TRI G.GOSPODINOV; COP US R. BERNARDO",
-        "Cabin": "SEN CCM S.ZHEKOVA; INS CCM A.IVANOVA; CCM UT V.PETROV"
-      },
-      {
-        "Duty": "CAI8032",
-        "CheckIn": null,
-        "CheckOut": "13:20",
-        "Departure": "LHR",
-        "Arrival": "SOF",
-        "DepTime": "08:30",
-        "ArrivalTime": "11:00",
-        "Aircraft": "A320/BHL",
-        "Cockpit": "TRI G.GOSPODINOV; COP US R. BERNARDO",
-        "Cabin": "SEN CCM S.ZHEKOVA; INS CCM A.IVANOVA; CCM UT V.PETROV"
-      }
-    ]
-  },
-  {
-    "IndividualDay": "Fri, 05Apr",
-    "Date": "2025-04-05",
-    "FT_BLH": "05:45",
-    "FDT": "07:50",
-    "DT": "08:20",
-    "RP": "14:30",
-    "Flights": [
-      {
-        "Duty": "CAI8041",
-        "CheckIn": "02:40",
-        "CheckOut": null,
-        "Departure": "SOF",
-        "Arrival": "CDG",
-        "DepTime": "03:40",
-        "ArrivalTime": "06:10",
-        "Aircraft": "A320/BHL",
-        "Cockpit": "CAPT N.STOYANOV; FO R.IVANOV",
-        "Cabin": "SEN CCM T.PETROVA; INS CCM K.DIMITROVA"
-      },
-      {
-        "Duty": "CAI8042",
-        "CheckIn": null,
-        "CheckOut": "11:25",
-        "Departure": "CDG",
-        "Arrival": "SOF",
-        "DepTime": "07:00",
-        "ArrivalTime": "09:25",
-        "Aircraft": "A320/BHL",
-        "Cockpit": "CAPT N.STOYANOV; FO R.IVANOV",
-        "Cabin": "SEN CCM T.PETROVA; INS CCM K.DIMITROVA"
-      }
-    ]
-  },
-  {
-    "IndividualDay": "Sat, 06Apr",
-    "Date": "2025-04-06",
-    "FT_BLH": "06:00",
-    "FDT": "08:05",
-    "DT": "08:35",
-    "RP": "16:20",
-    "Flights": [
-      {
-        "Duty": "CAI8051",
-        "CheckIn": "03:55",
-        "CheckOut": null,
-        "Departure": "SOF",
-        "Arrival": "WAW",
-        "DepTime": "04:55",
-        "ArrivalTime": "07:50", 
-        "Aircraft": "B777/ERJ",
-        "Cockpit": "CAPT I.KOLYADIN; FO D.PETROVA",
-        "Cabin": "SEN CCM L.GEORGIEVA; INS CCM M.KARPOV; CCM 2 I.NIKOLSKA"
-      },
-      {
-        "Duty": "CAI8052",
-        "CheckIn": null,
-        "CheckOut": "12:45",
-        "Departure": "WAW",
-        "Arrival": "SOF",
-        "DepTime": "08:50",
-        "ArrivalTime": "11:05",
-        "Aircraft": "B777/ERJ",
-        "Cockpit": "CAPT I.KOLYADIN; FO D.PETROVA",
-        "Cabin": "SEN CCM L.GEORGIEVA; INS CCM M.KARPOV; CCM 2 I.NIKOLSKA"
-      }
-    ]
-  },
-  {
-    "IndividualDay": "Sun, 07Apr",
-    "Date": "2025-04-07",
-    "FT_BLH": "05:50",
-    "FDT": "07:45",
-    "DT": "08:15",
-    "RP": "15:40",
-    "Flights": [
-      {
-        "Duty": "CAI8061",
-        "CheckIn": "02:35",
-        "CheckOut": null,
-        "Departure": "SOF",
-        "Arrival": "LHR",
-        "DepTime": "03:35",
-        "ArrivalTime": "06:10",
-        "Aircraft": "A320/BHL",
-        "Cockpit": "CAPT V.DIMOV; FO S.PETROV",
-        "Cabin": "SEN CCM R.KOSTADINOVA; CCM 2 T.NIKOLSKA"
-      },
-      {
-        "Duty": "CAI8062",
-        "CheckIn": null,
-        "CheckOut": "11:40",
-        "Departure": "LHR",
-        "Arrival": "SOF",
-        "DepTime": "07:00",
-        "ArrivalTime": "10:00",
-        "Aircraft": "A320/BHL",
-        "Cockpit": "CAPT V.DIMOV; FO S.PETROV",
-        "Cabin": "SEN CCM R.KOSTADINOVA; CCM 2 T.NIKOLSKA"
-      }
-    ]
-  },
-  {
-    "IndividualDay": "Mon, 08Apr",
-    "Date": "2025-04-08",
-    "Duty": "Day Off"
-  },
-  {
-    "IndividualDay": "Tue, 09Apr",
-    "Date": "2025-04-09",
-    "FT_BLH": "05:40",
-    "FDT": "07:35",
-    "DT": "08:05",
-    "RP": "14:50",
-    "Flights": [
-      {
-        "Duty": "CAI8081",
-        "CheckIn": "03:30",
-        "CheckOut": null,
-        "Departure": "SOF",
-        "Arrival": "WAW",
-        "DepTime": "04:30",
-        "ArrivalTime": "07:20",
-        "Aircraft": "A320/BHL",
-        "Cockpit": "CAPT M.TODOROV; FO E.KOSTADINOVA",
-        "Cabin": "SEN CCM P.STOILOV; CCM 2 G.PETROVA"
-      },
-      {
-        "Duty": "CAI8082",
-        "CheckIn": null,
-        "CheckOut": "12:20",
-        "Departure": "WAW",
-        "Arrival": "SOF",
-        "DepTime": "08:00",
-        "ArrivalTime": "10:10",
-        "Aircraft": "A320/BHL",
-        "Cockpit": "CAPT M.TODOROV; FO E.KOSTADINOVA",
-        "Cabin": "SEN CCM P.STOILOV; CCM 2 G.PETROVA"
-      }
-    ]
-  }
-];
 
 // Custom notification icon with proper size matching profile picture
 const BellIcon = ({ size = 28 }) => {
@@ -512,34 +262,54 @@ const getCurrentWeekDays = (calendarDays, selectedDate) => {
 };
 
 // Check if a date has flight data
-const hasFlightData = (date, month) => {
-  // Convert month index (0-based) to month name abbreviated
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  const monthStr = months[month];
+const hasFlightData = (date, month, flightData) => {
+  // Return early if flightData is not valid
+  if (!flightData || !Array.isArray(flightData) || flightData.length === 0) {
+    return null;
+  }
   
-  // Format date with leading zero if needed
-  const dateStr = date < 10 ? `0${date}` : `${date}`;
-  
-  // Look for this date in FLIGHT_DATA
-  return FLIGHT_DATA.find(day => {
-    // Some date formats in your data: "Mon, 01Apr"
-    return day.IndividualDay.includes(`${dateStr}${monthStr}`);
-  });
+  try {
+    // Convert month index (0-based) to month name abbreviated
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const monthStr = months[month];
+    
+    // Format date with leading zero if needed
+    const dateStr = date < 10 ? `0${date}` : `${date}`;
+    
+    // Look for this date in flightData
+    return flightData.find(day => {
+      // Some date formats in your data: "Mon, 01Apr"
+      return day && day.IndividualDay && day.IndividualDay.includes(`${dateStr}${monthStr}`);
+    });
+  } catch (err) {
+    console.error('Error in hasFlightData:', err);
+    return null;
+  }
 };
 
 // Get flight status for a date (multiple flights, single flight, day off, etc.)
-const getFlightStatus = (date, month) => {
-  const dayData = hasFlightData(date, month);
-  
-  if (!dayData) return 'none';
-  
-  if (dayData.Duty === 'Day Off') return 'dayOff';
-  
-  if (dayData.Flights) {
-    return dayData.Flights.length > 1 ? 'multipleFlights' : 'singleFlight';
+const getFlightStatus = (date, month, flightData) => {
+  try {
+    // Return safe default if flightData is not valid
+    if (!flightData || !Array.isArray(flightData)) {
+      return 'none';
+    }
+    
+    const dayData = hasFlightData(date, month, flightData);
+    
+    if (!dayData) return 'none';
+    
+    if (dayData.Duty === 'Day Off') return 'dayOff';
+    
+    if (dayData.Flights && Array.isArray(dayData.Flights)) {
+      return dayData.Flights.length > 1 ? 'multipleFlights' : 'singleFlight';
+    }
+    
+    return 'workNoFlight';
+  } catch (err) {
+    console.error('Error in getFlightStatus:', err);
+    return 'none';
   }
-  
-  return 'workNoFlight';
 };
 
 // Calculate time between two time strings
@@ -711,6 +481,13 @@ const FlightCrewApp = () => {
   const [isDateSelected, setIsDateSelected] = useState(false);
   const [calendarExpanded, setCalendarExpanded] = useState(true); // State for expanded/collapsed calendar
   
+  // New state for API data - initialize with empty array
+  const [flightData, setFlightData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  
+
+  
   // Animation values
   const dateSelectionAnim = useRef(new Animated.Value(1)).current;
   const calendarHeightAnim = useRef(new Animated.Value(1)).current;
@@ -722,6 +499,64 @@ const FlightCrewApp = () => {
   const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
   const dayNames = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
   
+  // Calculate dimensions for the screen and components
+  const { width, height } = Dimensions.get('window');
+  
+  // Fetch flight data from the API
+  const fetchFlightData = async () => {
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      console.log('Fetching data from API...');
+      const response = await fetch('https://crewshift.virtuslabs.lol/schedule', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: 'user123'
+        }),
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Server responded with ${response.status}: ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      
+      // Extract the schedule array from the response object
+      if (typeof data === 'object' && data !== null && Array.isArray(data.schedule)) {
+        // The API returns an object with a schedule property containing the array we want
+        console.log('Found schedule array in API response with', data.schedule.length, 'items');
+        setFlightData(data.schedule);
+      } else if (Array.isArray(data)) {
+        // The API directly returns an array
+        console.log('API returned array directly with', data.length, 'items');
+        setFlightData(data);
+      } else {
+        throw new Error('Invalid data format from API');
+      }
+      
+      setIsLoading(false);
+    } catch (err) {
+      console.error('Failed to fetch flight data:', err);
+      setError(err.message || 'Failed to fetch flight data');
+      
+      // Alert the user about the error
+      Alert.alert(
+        'Error',
+        'Failed to load schedule data. Please try again later.',
+        [{ text: 'OK' }]
+      );
+      
+      // Set empty array on error
+      setFlightData([]);
+      setIsLoading(false);
+    }
+  };
+  
   // Generate calendar days
   const calendarDays = generateCalendarData(selectedMonth);
   
@@ -730,6 +565,20 @@ const FlightCrewApp = () => {
   
   // Month selector scroll ref
   const monthScrollRef = useRef(null);
+  
+  // Fetch data when component mounts or when selected month changes
+  useEffect(() => {
+    try {
+      fetchFlightData();
+    } catch (err) {
+      console.error('Error in fetchFlightData effect:', err);
+      setIsLoading(false);
+      setError('Failed to initiate data fetch');
+      
+      // Initialize with empty array
+      setFlightData([]);
+    }
+  }, [selectedMonth]);
   
   // Load the calendar state - default to expanded
   useEffect(() => {
@@ -763,25 +612,39 @@ const FlightCrewApp = () => {
   useEffect(() => {
     // Look for the selected date in flight data
     const findSelectedDayData = () => {
+      // Ensure flightData is an array before trying to use it
+      if (isLoading || error || !flightData || !Array.isArray(flightData) || flightData.length === 0) {
+        setSelectedDayData(null);
+        return;
+      }
+      
       const dateStr = selectedDate < 10 ? `0${selectedDate}` : `${selectedDate}`;
       const monthStr = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][selectedMonth];
       
-      const dayData = FLIGHT_DATA.find(day => {
-        return day.IndividualDay.includes(`${dateStr}${monthStr}`);
-      });
-      
-      setSelectedDayData(dayData);
-      
-      // Update duty times based on the selected day data
-      if (dayData) {
-        const times = getDayDutyTimes(dayData);
-        setDutyTimes(times);
+      try {
+        const dayData = flightData.find(day => {
+          return day && day.IndividualDay && day.IndividualDay.includes(`${dateStr}${monthStr}`);
+        });
         
-        // Update display date based on selection
-        if (isDateSelected) {
-          const newDate = new Date(2025, selectedMonth, selectedDate);
-          setDisplayDate(newDate);
+        setSelectedDayData(dayData || null);
+        
+        // Update duty times based on the selected day data
+        if (dayData) {
+          const times = getDayDutyTimes(dayData);
+          setDutyTimes(times);
+          
+          // Update display date based on selection
+          if (isDateSelected) {
+            const newDate = new Date(2025, selectedMonth, selectedDate);
+            setDisplayDate(newDate);
+          }
+        } else {
+          setDutyTimes({ start: '', end: '' });
         }
+      } catch (err) {
+        console.error('Error processing flight data:', err);
+        setSelectedDayData(null);
+        setDutyTimes({ start: '', end: '' });
       }
     };
     
@@ -801,7 +664,7 @@ const FlightCrewApp = () => {
         useNativeDriver: true,
       })
     ]).start();
-  }, [selectedDate, selectedMonth, isDateSelected]);
+  }, [selectedDate, selectedMonth, isDateSelected, flightData, isLoading, error]);
   
   // Get the current time
   useEffect(() => {
@@ -857,9 +720,6 @@ const FlightCrewApp = () => {
       setCalendarExpanded(!calendarExpanded);
     }, 150); // Short delay for better user experience
   };
-  
-  // Calculate dimensions for the screen and components
-  const { width, height } = Dimensions.get('window');
   
   // Calculate calendar height with even better collapsed height
   const calendarHeight = calendarHeightAnim.interpolate({
@@ -986,50 +846,68 @@ const FlightCrewApp = () => {
               {/* Calendar Dates Grid - Shows either the current week or full month */}
               <View style={styles.datesGrid}>
                 {(calendarExpanded ? calendarDays : currentWeekDays).map((day, index) => {
-                  const isCurrentMonth = day.isCurrentMonth;
-                  const isSelected = isCurrentMonth && day.date === selectedDate && day.month === selectedMonth;
-                  
-                  // Determine flight status for visual indicators
-                  const flightStatus = isCurrentMonth ? getFlightStatus(day.date, day.month) : 'none';
-                  
-                  return (
-                    <TouchableOpacity
-                      key={`${day.date}-${day.month}-${index}`}
-                      style={[
-                        styles.dateButton,
-                        !isCurrentMonth && styles.otherMonthDate,
-                        isSelected && styles.selectedDate,
-                        !isSelected && flightStatus === 'multipleFlights' && styles.multipleFlightsDate,
-                        !isSelected && flightStatus === 'singleFlight' && styles.singleFlightDate,
-                        !isSelected && flightStatus === 'dayOff' && styles.dayOffDate,
-                        !isSelected && flightStatus === 'workNoFlight' && styles.workNoFlightDate,
-                      ]}
-                      onPress={() => handleDaySelect(day)}
-                      activeOpacity={isCurrentMonth ? 0.7 : 0.9}
-                    >
-                      <Text
+                  try {
+                    const isCurrentMonth = day.isCurrentMonth;
+                    const isSelected = isCurrentMonth && day.date === selectedDate && day.month === selectedMonth;
+                    
+                    // Determine flight status for visual indicators with fallback to 'none'
+                    let flightStatus = 'none';
+                    if (isCurrentMonth && Array.isArray(flightData)) {
+                      flightStatus = getFlightStatus(day.date, day.month, flightData);
+                    }
+                    
+                    return (
+                      <TouchableOpacity
+                        key={`${day.date}-${day.month}-${index}`}
                         style={[
-                          styles.dateText,
-                          !isCurrentMonth && styles.otherMonthDateText,
-                          (isSelected || flightStatus !== 'none') && styles.specialDateText,
-                          flightStatus === 'dayOff' && !isSelected && styles.dayOffDateText,
+                          styles.dateButton,
+                          !isCurrentMonth && styles.otherMonthDate,
+                          isSelected && styles.selectedDate,
+                          !isSelected && flightStatus === 'multipleFlights' && styles.multipleFlightsDate,
+                          !isSelected && flightStatus === 'singleFlight' && styles.singleFlightDate,
+                          !isSelected && flightStatus === 'dayOff' && styles.dayOffDate,
+                          !isSelected && flightStatus === 'workNoFlight' && styles.workNoFlightDate,
                         ]}
+                        onPress={() => handleDaySelect(day)}
+                        activeOpacity={isCurrentMonth ? 0.7 : 0.9}
                       >
-                        {day.date}
-                      </Text>
-                      
-                      {/* Indicator dots for different flight statuses */}
-                      {isCurrentMonth && flightStatus !== 'none' && !isSelected && (
-                        <View style={[
-                          styles.statusIndicator,
-                          flightStatus === 'multipleFlights' && styles.multipleFlightsIndicator,
-                          flightStatus === 'singleFlight' && styles.singleFlightIndicator,
-                          flightStatus === 'dayOff' && styles.dayOffIndicator,
-                          flightStatus === 'workNoFlight' && styles.workNoFlightIndicator,
-                        ]} />
-                      )}
-                    </TouchableOpacity>
-                  );
+                        <Text
+                          style={[
+                            styles.dateText,
+                            !isCurrentMonth && styles.otherMonthDateText,
+                            (isSelected || flightStatus !== 'none') && styles.specialDateText,
+                            flightStatus === 'dayOff' && !isSelected && styles.dayOffDateText,
+                          ]}
+                        >
+                          {day.date}
+                        </Text>
+                        
+                        {/* Indicator dots for different flight statuses */}
+                        {isCurrentMonth && flightStatus !== 'none' && !isSelected && (
+                          <View style={[
+                            styles.statusIndicator,
+                            flightStatus === 'multipleFlights' && styles.multipleFlightsIndicator,
+                            flightStatus === 'singleFlight' && styles.singleFlightIndicator,
+                            flightStatus === 'dayOff' && styles.dayOffIndicator,
+                            flightStatus === 'workNoFlight' && styles.workNoFlightIndicator,
+                          ]} />
+                        )}
+                      </TouchableOpacity>
+                    );
+                  } catch (err) {
+                    console.error('Error rendering calendar day:', err);
+                    return (
+                      <TouchableOpacity
+                        key={`error-${index}`}
+                        style={[styles.dateButton, styles.otherMonthDate]}
+                        onPress={() => {}}
+                      >
+                        <Text style={[styles.dateText, styles.otherMonthDateText]}>
+                          {day?.date || '?'}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  }
                 })}
               </View>
               
@@ -1075,8 +953,29 @@ const FlightCrewApp = () => {
               </TouchableOpacity>
             </View>
 
+            {/* Loading indicator */}
+            {isLoading && (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color="#1a237e" />
+                <Text style={styles.loadingText}>Loading flight data...</Text>
+              </View>
+            )}
+
+            {/* Error message */}
+            {error && !isLoading && (
+              <View style={styles.errorContainer}>
+                <Text style={styles.errorText}>Failed to load flight data.</Text>
+                <TouchableOpacity 
+                  style={styles.retryButton}
+                  onPress={fetchFlightData}
+                >
+                  <Text style={styles.retryButtonText}>Retry</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+
             {/* No flights message */}
-            {(!selectedDayData || selectedDayData.Duty === 'Day Off') && (
+            {!isLoading && !error && (!selectedDayData || selectedDayData.Duty === 'Day Off') && (
               <Animated.View 
                 style={[
                   styles.noFlightsContainer,
@@ -1094,7 +993,7 @@ const FlightCrewApp = () => {
             )}
 
             {/* Flight Tickets */}
-            {selectedDayData && selectedDayData.Flights && (
+            {!isLoading && !error && selectedDayData && selectedDayData.Flights && (
               <FlatList
                 data={selectedDayData.Flights}
                 keyExtractor={(item, index) => `flight-${item.Duty}-${index}`}
@@ -1585,46 +1484,61 @@ const styles = StyleSheet.create({
     color: '#666',
     textAlign: 'center',
   },
-  bottomSpacer: {
-    height: 100, // Increased for bottom tab bar
-  },
-  // Bottom Tab Bar
-  bottomTabBar: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 70,
+  loadingContainer: {
     backgroundColor: '#FFFFFF',
-    flexDirection: 'row',
+    borderRadius: 15,
+    padding: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: -2,
+      height: 2,
     },
     shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 10,
-    borderTopWidth: 1,
-    borderTopColor: '#F0F0F0',
+    shadowRadius: 4,
+    elevation: 3,
+    minHeight: 150,
   },
-  tabButton: {
-    flex: 1,
-    justifyContent: 'center',
+  loadingText: {
+    fontSize: 16,
+    color: '#666',
+    marginTop: 15,
+  },
+  errorContainer: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 15,
+    padding: 20,
     alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    minHeight: 120,
   },
-  activeTabButton: {
-    borderTopWidth: 3,
-    borderTopColor: '#1a237e',
+  errorText: {
+    fontSize: 16,
+    color: '#FF6B6B',
+    marginBottom: 15,
   },
-  tabButtonText: {
-    fontSize: 12,
-    color: '#999',
-    marginTop: 5,
+  retryButton: {
+    backgroundColor: '#1a237e',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 20,
   },
-  activeTabButtonText: {
-    color: '#1a237e',
+  retryButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
     fontWeight: '500',
+  },
+  bottomSpacer: {
+    height: 100, // Increased for bottom tab bar
   },
 });
 
