@@ -11,8 +11,12 @@ import {
   Dimensions,
   FlatList,
   Animated,
-  Easing
+  Easing,
+  Image
 } from 'react-native';
+
+// Import StayScreen component
+import StayScreen from './StayScreen';
 
 // Helper functions
 const formatDate = (date) => {
@@ -20,14 +24,8 @@ const formatDate = (date) => {
   return date.toLocaleDateString('en-US', options);
 };
 
-const formatDateShort = (date) => {
-  const options = { weekday: 'short', day: '2-digit', month: 'short' };
-  return date.toLocaleDateString('en-US', options);
-};
-
 const formatTime = (timeString) => {
   if (!timeString) return null;
-  // Handle time formatting (assuming timeString is in format "HH:MM")
   return timeString;
 };
 
@@ -44,7 +42,7 @@ const FLAGS = {
   'CDG': '🇫🇷',
 };
 
-// Flight data from JSON (this would be fetched from an API in production)
+// Flight data from JSON
 const FLIGHT_DATA = [
   {
     "IndividualDay": "Mon, 01Apr",
@@ -296,26 +294,31 @@ const FLIGHT_DATA = [
   }
 ];
 
-// Custom Icons with animations
-const BellIcon = ({ size = 24 }) => {
+// Custom notification icon with proper size matching profile picture
+const BellIcon = ({ size = 28 }) => {
   const bellSwing = useRef(new Animated.Value(0)).current;
+  const circleSize = 40; // Match profile picture size
   
   useEffect(() => {
-    Animated.sequence([
-      Animated.delay(1000),
-      Animated.timing(bellSwing, {
-        toValue: 1,
-        duration: 400,
-        easing: Easing.elastic(1.5),
-        useNativeDriver: true
-      }),
-      Animated.timing(bellSwing, {
-        toValue: 0,
-        duration: 400,
-        easing: Easing.elastic(1.5),
-        useNativeDriver: true
-      })
-    ]).start();
+    const animateBell = () => {
+      Animated.sequence([
+        Animated.timing(bellSwing, {
+          toValue: 1,
+          duration: 400,
+          easing: Easing.elastic(1.5),
+          useNativeDriver: true
+        }),
+        Animated.timing(bellSwing, {
+          toValue: 0,
+          duration: 400,
+          easing: Easing.elastic(1.5),
+          useNativeDriver: true
+        }),
+        Animated.delay(5000)
+      ]).start(animateBell);
+    };
+    
+    animateBell();
   }, []);
 
   const rotation = bellSwing.interpolate({
@@ -325,72 +328,124 @@ const BellIcon = ({ size = 24 }) => {
 
   return (
     <Animated.View style={{ transform: [{ rotate: rotation }] }}>
-      <View style={{width: size, height: size}}>
-        <View style={{
-          width: size*0.7, 
-          height: size*0.7, 
-          borderWidth: 2, 
-          borderColor: '#FFFFFF', 
-          borderRadius: size*0.35,
-          position: 'absolute',
-          top: 0,
-          left: size*0.15
-        }} />
-        <View style={{
-          width: size*0.3, 
-          height: size*0.1, 
-          borderWidth: 2,
-          borderColor: '#FFFFFF',
-          borderRadius: size*0.1,
-          position: 'absolute',
-          bottom: 1,
-          left: size*0.35
-        }} />
-        <View style={{
-          width: size*0.4, 
-          height: size*0.4, 
-          borderWidth: 0,
-          borderTopLeftRadius: size*0.2,
-          borderTopRightRadius: size*0.2,
-          position: 'absolute',
-          top: size*0.1,
-          left: size*0.3
-        }} />
+      <View style={{
+        width: circleSize,
+        height: circleSize,
+        borderRadius: circleSize/2,
+        borderWidth: 0.8,
+        borderColor: '#FFFFFF',
+        justifyContent: 'center',
+        alignItems: 'center'
+      }}>
+        {/* Smaller bell with proper proportions */}
+        <View style={{width: size, height: size, position: 'relative'}}>
+          {/* Bell shape */}
+          <View style={{
+            width: size*0.65,
+            height: size*0.65,
+            borderWidth: 1.2,
+            borderColor: '#FFFFFF',
+            borderTopLeftRadius: size*0.325,
+            borderTopRightRadius: size*0.325,
+            borderBottomLeftRadius: size*0.1,
+            borderBottomRightRadius: size*0.1,
+            position: 'absolute',
+            top: size*0.15,
+            left: size*0.175
+          }} />
+          
+          {/* Bell handle */}
+          <View style={{
+            width: size*0.25,
+            height: size*0.15,
+            borderWidth: 1.2,
+            borderColor: '#FFFFFF',
+            borderRadius: size*0.15,
+            position: 'absolute',
+            top: size*0.05,
+            left: size*0.375
+          }} />
+          
+          {/* Bell clapper */}
+          <View style={{
+            width: size*0.08,
+            height: size*0.08,
+            backgroundColor: '#FFFFFF',
+            borderRadius: size*0.04,
+            position: 'absolute',
+            bottom: size*0.1,
+            left: size*0.46
+          }} />
+        </View>
       </View>
     </Animated.View>
   );
 };
 
-const UserIcon = ({ size = 24 }) => {
+// User profile image with subtle white border
+const ProfileImage = ({ size = 40 }) => {
   return (
-    <View style={{width: size, height: size}}>
+    <View style={{
+      width: size + 4,
+      height: size + 4,
+      borderRadius: (size + 4) / 2,
+      backgroundColor: '#FFFFFF', // Solid white border
+      justifyContent: 'center',
+      alignItems: 'center',
+      shadowColor: '#FFFFFF',
+      shadowOffset: { width: 0, height: 0 },
+      shadowOpacity: 0.3,
+      shadowRadius: 2,
+      elevation: 2,
+    }}>
       <View style={{
-        width: size*0.5, 
-        height: size*0.5, 
-        borderWidth: 2, 
-        borderColor: '#FFFFFF', 
-        borderRadius: size*0.25,
-        position: 'absolute',
-        top: 0,
-        left: size*0.25
-      }} />
+        width: size,
+        height: size,
+        borderRadius: size / 2,
+        overflow: 'hidden',
+      }}>
+        {/* You need to add ProfilePicture1.jpg to your assets folder */}
+        <Image 
+          source={require('./assets/ProfilePicture1.jpg')} 
+          style={{
+            width: size,
+            height: size,
+            resizeMode: 'cover'
+          }}
+        />
+      </View>
+    </View>
+  );
+};
+
+// Arrow Icon component
+const ArrowIcon = ({ expanded, size = 24 }) => {
+  return (
+    <View style={{ 
+      width: size, 
+      height: size, 
+      justifyContent: 'center', 
+      alignItems: 'center',
+      backgroundColor: 'rgba(0,0,0,0.05)',
+      borderRadius: size/2,
+      padding: 5,
+      transform: [{ rotate: expanded ? '180deg' : '0deg' }]
+    }}>
       <View style={{
-        width: size*0.7, 
-        height: size*0.35, 
-        borderWidth: 2,
-        borderColor: '#FFFFFF',
-        borderRadius: size*0.15,
-        borderBottomLeftRadius: size*0.25,
-        borderBottomRightRadius: size*0.25,
-        position: 'absolute',
-        bottom: 0,
-        left: size*0.15
+        width: 0,
+        height: 0,
+        borderLeftWidth: size/4,
+        borderRightWidth: size/4,
+        borderTopWidth: size/4,
+        borderLeftColor: 'transparent',
+        borderRightColor: 'transparent',
+        borderTopColor: '#666',
       }} />
     </View>
   );
 };
 
-// Calendar data processing - Fixed to show only necessary days
+// Generate accurate calendar data
 const generateCalendarData = (selectedMonth) => {
   // Get the first day of the month
   const firstDay = new Date(2025, selectedMonth, 1);
@@ -408,9 +463,9 @@ const generateCalendarData = (selectedMonth) => {
   const days = [];
   
   // Previous month days (only those needed to fill first row)
-  for (let i = firstDayOfWeek - 1; i >= 0; i--) {
+  for (let i = 0; i < firstDayOfWeek; i++) {
     days.push({
-      date: daysInPrevMonth - i,
+      date: daysInPrevMonth - firstDayOfWeek + i + 1,
       month: selectedMonth - 1,
       isCurrentMonth: false
     });
@@ -438,6 +493,22 @@ const generateCalendarData = (selectedMonth) => {
   }
   
   return days;
+};
+
+// Get current week from calendar data based on the selected date
+const getCurrentWeekDays = (calendarDays, selectedDate) => {
+  // Find the index of the selected date in the calendar days
+  const selectedIndex = calendarDays.findIndex(
+    day => day.isCurrentMonth && day.date === selectedDate
+  );
+  
+  if (selectedIndex === -1) return calendarDays.slice(0, 7);
+  
+  // Find the start of the week containing the selected date
+  const startOfWeekIndex = selectedIndex - (selectedIndex % 7);
+  
+  // Return the week containing the selected date
+  return calendarDays.slice(startOfWeekIndex, startOfWeekIndex + 7);
 };
 
 // Check if a date has flight data
@@ -491,15 +562,6 @@ const calculateDuration = (depTime, arrTime) => {
   return `${hours} Hours ${minutes} minutes`;
 };
 
-// Get display date from a date object or string
-const getDisplayDate = (dateObj) => {
-  if (typeof dateObj === 'string') {
-    const [year, month, day] = dateObj.split('-').map(Number);
-    dateObj = new Date(year, month - 1, day);
-  }
-  return formatDate(dateObj);
-};
-
 // Calculate first and last flights of a day
 const getDayDutyTimes = (dayData) => {
   if (!dayData || !dayData.Flights || dayData.Flights.length === 0) {
@@ -518,6 +580,126 @@ const getDayDutyTimes = (dayData) => {
   return { start: startTime, end: endTime };
 };
 
+// Crew member stacked images component
+const CrewImages = ({ onPress }) => {
+  return (
+    <TouchableOpacity style={styles.crewImagesContainer} onPress={onPress}>
+      <View style={styles.crewStackedImages}>
+        {/* Use colored circles instead of images to avoid requiring files */}
+        <View style={[styles.crewImage, { right: 0, backgroundColor: '#4285F4' }]} />
+        <View style={[styles.crewImage, { right: 20, backgroundColor: '#EA4335' }]} />
+        <View style={[styles.crewImage, { right: 40, backgroundColor: '#FBBC05' }]} />
+      </View>
+      <View style={styles.expandIconContainer}>
+        <Text style={styles.expandIcon}>ⓘ</Text>
+      </View>
+    </TouchableOpacity>
+  );
+};
+
+// Flight card component
+const FlightCard = ({ item, index, dateSelectionAnim }) => {
+  const duration = calculateDuration(item.DepTime, item.ArrivalTime);
+  const [showCrewDetails, setShowCrewDetails] = useState(false);
+  
+  // Animation for entry
+  const entryAnim = useRef(new Animated.Value(0)).current;
+  
+  useEffect(() => {
+    Animated.timing(entryAnim, {
+      toValue: 1,
+      duration: 300,
+      delay: index * 150, // Stagger animation
+      useNativeDriver: true,
+    }).start();
+  }, []);
+
+  const toggleCrewDetails = () => {
+    setShowCrewDetails(!showCrewDetails);
+  };
+  
+  return (
+    <Animated.View 
+      style={[
+        styles.flightTicket,
+        {
+          opacity: entryAnim,
+          transform: [
+            { scale: Animated.multiply(dateSelectionAnim, entryAnim) },
+            { translateY: entryAnim.interpolate({
+              inputRange: [0, 1],
+              outputRange: [20, 0]
+            }) }
+          ]
+        }
+      ]}
+    >
+      {/* New flight card layout matching the screenshot */}
+      <View style={styles.flightCardHeader}>
+        <View style={styles.flightOriginDestination}>
+          {/* Origin */}
+          <View style={styles.flightEndpoint}>
+            <Text style={styles.locationName}>
+              {item.Departure} {FLAGS[item.Departure] || '🏳️'}
+            </Text>
+            <Text style={styles.flightTime}>{item.DepTime}</Text>
+          </View>
+          
+          {/* Flight number in center */}
+          <View style={styles.flightNumberContainer}>
+            <Text style={styles.flightNumberText}>{item.Duty}</Text>
+          </View>
+          
+          {/* Destination */}
+          <View style={styles.flightEndpoint}>
+            <Text style={styles.locationName}>
+              {item.Arrival} {FLAGS[item.Arrival] || '🏳️'}
+            </Text>
+            <Text style={styles.flightTime}>{item.ArrivalTime}</Text>
+          </View>
+        </View>
+      </View>
+      
+      {/* Flight Progress */}
+      <View style={styles.flightProgressContainer}>
+        <View style={styles.flightProgressLine}>
+          <View style={styles.flightProgressDot} />
+          <View style={styles.flightProgressBar}>
+            <Text style={{ fontSize: 20 }}>✈️</Text>
+          </View>
+          <View style={styles.flightProgressDot} />
+        </View>
+        <Text style={styles.flightDuration}>{duration}</Text>
+      </View>
+      
+      {/* Bottom section with aircraft and crew */}
+      <View style={styles.flightCardFooter}>
+        <View style={styles.aircraftContainer}>
+          <Text style={styles.aircraftLabel}>A/C</Text>
+          <Text style={styles.aircraftType}>{item.Aircraft}</Text>
+        </View>
+        
+        <CrewImages onPress={toggleCrewDetails} />
+      </View>
+      
+      {/* Expandable Crew Details */}
+      {showCrewDetails && (
+        <View style={styles.crewDetailsContainer}>
+          <View style={styles.crewSection}>
+            <Text style={styles.crewSectionTitle}>Cockpit:</Text>
+            <Text style={styles.crewMembers}>{item.Cockpit}</Text>
+          </View>
+          <View style={styles.crewDivider} />
+          <View style={styles.crewSection}>
+            <Text style={styles.crewSectionTitle}>Cabin:</Text>
+            <Text style={styles.crewMembers}>{item.Cabin}</Text>
+          </View>
+        </View>
+      )}
+    </Animated.View>
+  );
+};
+
 // Main App Component
 const FlightCrewApp = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -527,11 +709,14 @@ const FlightCrewApp = () => {
   const [selectedDayData, setSelectedDayData] = useState(null);
   const [dutyTimes, setDutyTimes] = useState({ start: '', end: '' });
   const [isDateSelected, setIsDateSelected] = useState(false);
+  const [calendarExpanded, setCalendarExpanded] = useState(true); // State for expanded/collapsed calendar
   
-  // Animations
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const scaleAnim = useRef(new Animated.Value(0.95)).current;
-  const slideAnim = useRef(new Animated.Value(50)).current;
+  // Animation values
+  const dateSelectionAnim = useRef(new Animated.Value(1)).current;
+  const calendarHeightAnim = useRef(new Animated.Value(1)).current;
+  
+  // ScrollView ref to enable programmatic scrolling
+  const scrollViewRef = useRef(null);
   
   // Month names for display
   const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -540,29 +725,39 @@ const FlightCrewApp = () => {
   // Generate calendar days
   const calendarDays = generateCalendarData(selectedMonth);
   
-  // Start animations
+  // Get current week days for collapsed view
+  const currentWeekDays = getCurrentWeekDays(calendarDays, selectedDate);
+  
+  // Month selector scroll ref
+  const monthScrollRef = useRef(null);
+  
+  // Load the calendar state - default to expanded
   useEffect(() => {
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 800,
-        useNativeDriver: true,
-      }),
-      Animated.timing(scaleAnim, {
-        toValue: 1,
-        duration: 800,
-        useNativeDriver: true,
-      }),
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 800,
-        useNativeDriver: true,
-      })
-    ]).start();
+    // Set initial state to expanded
+    setCalendarExpanded(true);
+    calendarHeightAnim.setValue(1);
+    
+    // Scroll to selected month with less aggressive scrolling
+    setTimeout(() => {
+      if (monthScrollRef.current) {
+        const monthItemWidth = 100;
+        const offset = width / 2 - 50;
+        const position = Math.max(0, (selectedMonth * monthItemWidth) - offset);
+        monthScrollRef.current.scrollTo({ x: position, animated: true });
+      }
+    }, 300);
   }, []);
   
-  // Handle calendar date selection animation
-  const dateSelectionAnim = useRef(new Animated.Value(1)).current;
+  // Handle expand/collapse state changes
+  useEffect(() => {
+    // Animate the calendar height change with ultra-smooth animation
+    Animated.spring(calendarHeightAnim, {
+      toValue: calendarExpanded ? 1 : 0,
+      friction: 9,
+      tension: 38,
+      useNativeDriver: false, // Can't use native driver for height animations
+    }).start();
+  }, [calendarExpanded]);
   
   // Update selected day data when date changes
   useEffect(() => {
@@ -592,16 +787,16 @@ const FlightCrewApp = () => {
     
     findSelectedDayData();
     
-    // Animate date selection
+    // Subtle animation for date selection with practical purpose
     Animated.sequence([
       Animated.timing(dateSelectionAnim, {
-        toValue: 0.9,
-        duration: 150,
+        toValue: 0.95,
+        duration: 120,
         useNativeDriver: true,
       }),
       Animated.spring(dateSelectionAnim, {
         toValue: 1,
-        friction: 7,
+        friction: 4,
         tension: 40,
         useNativeDriver: true,
       })
@@ -628,179 +823,224 @@ const FlightCrewApp = () => {
     if (day.isCurrentMonth) {
       setSelectedDate(day.date);
       setIsDateSelected(true);
+      
+      // Subtle scroll to flights section for better UX
+      if (scrollViewRef.current) {
+        setTimeout(() => {
+          scrollViewRef.current.scrollTo({ 
+            y: 450, 
+            animated: true 
+          });
+        }, 300);
+      }
     }
   };
   
+  // Toggle calendar expanded/collapsed state with delay
+  const toggleCalendarExpanded = () => {
+    // Add a subtle press animation
+    Animated.sequence([
+      Animated.timing(dateSelectionAnim, {
+        toValue: 0.95,
+        duration: 100,
+        useNativeDriver: true
+      }),
+      Animated.timing(dateSelectionAnim, {
+        toValue: 1,
+        duration: 100,
+        useNativeDriver: true
+      })
+    ]).start();
+    
+    // Add a slight delay before changing the state
+    setTimeout(() => {
+      setCalendarExpanded(!calendarExpanded);
+    }, 150); // Short delay for better user experience
+  };
+  
+  // Calculate dimensions for the screen and components
+  const { width, height } = Dimensions.get('window');
+  
+  // Calculate calendar height with even better collapsed height
+  const calendarHeight = calendarHeightAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [320, 650] // Further increased heights to prevent cutoff
+  });
+  
+  // Calculate padding with significantly increased values for collapsed state
+  const calendarPadding = calendarHeightAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [250, 180] // Much more padding when collapsed, less when expanded
+  });
+  
   return (
-    <>
+    <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#080808" />
-      <View style={styles.container}>
-        {/* Top Dark Section */}
+      
+      {/* Everything is in a ScrollView that scrolls entirely */}
+      <ScrollView 
+        ref={scrollViewRef}
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Top black section */}
         <View style={styles.topSection}>
-          <SafeAreaView style={styles.topContent}>
-            {/* Welcome Section now in the black area */}
-            <Animated.View 
-              style={[
-                styles.welcomeSection,
-                {
-                  opacity: fadeAnim,
-                  transform: [
-                    { translateY: slideAnim },
-                    { scale: scaleAnim }
-                  ]
-                }
-              ]}
-            >
-              <Text style={styles.welcomeTitle}>Hello, {USER_NAME}</Text>
-              <Text style={styles.welcomeSubtitle}>What's on today's agenda?</Text>
-            </Animated.View>
-            
+          <SafeAreaView>
             <View style={styles.headerRow}>
               <TouchableOpacity style={styles.iconButton}>
                 <BellIcon size={28} />
               </TouchableOpacity>
-              <Animated.Text 
-                style={[
-                  styles.dateText,
-                  {
-                    opacity: fadeAnim,
-                    transform: [{ scale: dateSelectionAnim }]
-                  }
-                ]}
-              >
-                {formattedHeaderDate}
-              </Animated.Text>
+              <Text style={styles.dateText}>{formattedHeaderDate}</Text>
               <TouchableOpacity style={styles.iconButton}>
-                <UserIcon size={28} />
+                <ProfileImage size={40} />
               </TouchableOpacity>
             </View>
             
-            <Animated.View 
-              style={[
-                styles.timeContainer,
-                {
-                  opacity: fadeAnim,
-                  transform: [{ scale: dateSelectionAnim }]
-                }
-              ]}
-            >
+            <View style={styles.timeContainer}>
               <Text style={styles.timeText}>{dutyTimes.start || '--:--'}</Text>
               <Text style={styles.timeSeparator}>•</Text>
               <Text style={styles.timeText}>{dutyTimes.end || '--:--'}</Text>
-            </Animated.View>
+            </View>
+            
+            <View style={styles.divider} />
+            
+            <View style={styles.welcomeSection}>
+              <Text style={styles.welcomeTitle}>Hello, {USER_NAME}</Text>
+              <Text style={styles.welcomeSubtitle}>What's on today's agenda?</Text>
+            </View>
           </SafeAreaView>
-          <View style={styles.divider} />
         </View>
-
-        {/* Main Content with Background */}
-        <View style={styles.mainContent}>
-          {/* Circular Arc Overlay */}
-          <View style={styles.circleOverlay} />
-
-          <ScrollView style={styles.scrollContent} showsVerticalScrollIndicator={false}>
-            {/* Calendar Section */}
-            <Animated.View 
-              style={[
-                styles.calendarContainer,
-                {
-                  opacity: fadeAnim,
-                  transform: [
-                    { translateY: slideAnim },
-                    { scale: scaleAnim }
-                  ]
-                }
-              ]}
-            >
-              {/* Month Selector */}
+        
+        {/* Calendar section with black background - Height animates based on expanded state */}
+        <Animated.View style={[
+          styles.calendarSection,
+          { 
+            height: calendarHeight, 
+            paddingBottom: calendarPadding,
+            marginBottom: calendarExpanded ? 0 : 40, // Extra margin when collapsed
+          }
+        ]}>
+          {/* Light oval positioned in the black background */}
+          <View style={[styles.lightOval, {
+            width: width * 1.5, 
+            height: width * 1.5,
+            borderRadius: width * 0.75,
+            top: 250, // Fixed position from the top for better placement
+          }]} />
+          
+          {/* Calendar Card positioned on top */}
+          <View style={styles.calendarContainer}>
+            {/* Month Selector and Expand/Collapse Toggle */}
+            <View style={styles.calendarHeader}>
               <ScrollView 
+                ref={monthScrollRef}
                 horizontal 
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={styles.monthsContainer}
               >
-                {monthNames.map((month, index) => (
-                  <TouchableOpacity 
-                    key={month} 
-                    style={[
-                      styles.monthButton,
-                      selectedMonth === index && styles.selectedMonthButton
-                    ]}
-                    onPress={() => setSelectedMonth(index)}
-                  >
-                    <Text 
+                {monthNames.map((month, index) => {
+                  const isSelected = selectedMonth === index;
+                  
+                  return (
+                    <TouchableOpacity 
+                      key={month} 
                       style={[
-                        styles.monthText,
-                        selectedMonth === index && styles.selectedMonthText
+                        styles.monthButton,
+                        isSelected && styles.selectedMonthButton
                       ]}
+                      onPress={() => setSelectedMonth(index)}
                     >
-                      {month}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </ScrollView>
-
-              {/* Calendar Grid */}
-              <View style={styles.calendarGrid}>
-                {/* Day Headers */}
-                <View style={styles.daysHeader}>
-                  {dayNames.map((day) => (
-                    <Text key={day} style={styles.dayHeaderText}>
-                      {day}
-                    </Text>
-                  ))}
-                </View>
-
-                {/* Calendar Dates */}
-                <View style={styles.datesGrid}>
-                  {calendarDays.map((day, index) => {
-                    const isCurrentMonth = day.isCurrentMonth;
-                    const isSelected = isCurrentMonth && day.date === selectedDate && day.month === selectedMonth;
-                    
-                    // Determine flight status for visual indicators
-                    const flightStatus = isCurrentMonth ? getFlightStatus(day.date, day.month) : 'none';
-                    
-                    return (
-                      <TouchableOpacity
-                        key={`${day.date}-${day.month}-${index}`}
+                      <Text 
                         style={[
-                          styles.dateButton,
-                          !isCurrentMonth && styles.otherMonthDate,
-                          isSelected && styles.selectedDate,
-                          !isSelected && flightStatus === 'multipleFlights' && styles.multipleFlightsDate,
-                          !isSelected && flightStatus === 'singleFlight' && styles.singleFlightDate,
-                          !isSelected && flightStatus === 'dayOff' && styles.dayOffDate,
-                          !isSelected && flightStatus === 'workNoFlight' && styles.workNoFlightDate,
+                          styles.monthText,
+                          isSelected && styles.selectedMonthText
                         ]}
-                        onPress={() => handleDaySelect(day)}
-                        activeOpacity={isCurrentMonth ? 0.6 : 0.9}
                       >
-                        <Text
-                          style={[
-                            styles.dateText,
-                            !isCurrentMonth && styles.otherMonthDateText,
-                            (isSelected || flightStatus !== 'none') && styles.specialDateText,
-                            flightStatus === 'dayOff' && !isSelected && styles.dayOffDateText,
-                          ]}
-                        >
-                          {day.date}
-                        </Text>
-                        
-                        {/* Indicator dots for different flight statuses */}
-                        {isCurrentMonth && flightStatus !== 'none' && !isSelected && (
-                          <View style={[
-                            styles.statusIndicator,
-                            flightStatus === 'multipleFlights' && styles.multipleFlightsIndicator,
-                            flightStatus === 'singleFlight' && styles.singleFlightIndicator,
-                            flightStatus === 'dayOff' && styles.dayOffIndicator,
-                            flightStatus === 'workNoFlight' && styles.workNoFlightIndicator,
-                          ]} />
-                        )}
-                      </TouchableOpacity>
-                    );
-                  })}
-                </View>
-                
-                {/* Calendar Legend */}
-                <View style={styles.legendContainer}>
+                        {month}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </ScrollView>
+              
+              {/* Toggle button for expand/collapse - icon only */}
+              <TouchableOpacity 
+                style={styles.expandToggleButton}
+                onPress={toggleCalendarExpanded}
+              >
+                <ArrowIcon expanded={calendarExpanded} size={24} />
+              </TouchableOpacity>
+            </View>
+
+            {/* Calendar Grid */}
+            <View style={styles.calendarGrid}>
+              {/* Day Headers */}
+              <View style={styles.daysHeader}>
+                {dayNames.map((day) => (
+                  <Text key={day} style={styles.dayHeaderText}>
+                    {day}
+                  </Text>
+                ))}
+              </View>
+
+              {/* Calendar Dates Grid - Shows either the current week or full month */}
+              <View style={styles.datesGrid}>
+                {(calendarExpanded ? calendarDays : currentWeekDays).map((day, index) => {
+                  const isCurrentMonth = day.isCurrentMonth;
+                  const isSelected = isCurrentMonth && day.date === selectedDate && day.month === selectedMonth;
+                  
+                  // Determine flight status for visual indicators
+                  const flightStatus = isCurrentMonth ? getFlightStatus(day.date, day.month) : 'none';
+                  
+                  return (
+                    <TouchableOpacity
+                      key={`${day.date}-${day.month}-${index}`}
+                      style={[
+                        styles.dateButton,
+                        !isCurrentMonth && styles.otherMonthDate,
+                        isSelected && styles.selectedDate,
+                        !isSelected && flightStatus === 'multipleFlights' && styles.multipleFlightsDate,
+                        !isSelected && flightStatus === 'singleFlight' && styles.singleFlightDate,
+                        !isSelected && flightStatus === 'dayOff' && styles.dayOffDate,
+                        !isSelected && flightStatus === 'workNoFlight' && styles.workNoFlightDate,
+                      ]}
+                      onPress={() => handleDaySelect(day)}
+                      activeOpacity={isCurrentMonth ? 0.7 : 0.9}
+                    >
+                      <Text
+                        style={[
+                          styles.dateText,
+                          !isCurrentMonth && styles.otherMonthDateText,
+                          (isSelected || flightStatus !== 'none') && styles.specialDateText,
+                          flightStatus === 'dayOff' && !isSelected && styles.dayOffDateText,
+                        ]}
+                      >
+                        {day.date}
+                      </Text>
+                      
+                      {/* Indicator dots for different flight statuses */}
+                      {isCurrentMonth && flightStatus !== 'none' && !isSelected && (
+                        <View style={[
+                          styles.statusIndicator,
+                          flightStatus === 'multipleFlights' && styles.multipleFlightsIndicator,
+                          flightStatus === 'singleFlight' && styles.singleFlightIndicator,
+                          flightStatus === 'dayOff' && styles.dayOffIndicator,
+                          flightStatus === 'workNoFlight' && styles.workNoFlightIndicator,
+                        ]} />
+                      )}
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+              
+              {/* Calendar Legend - Only visible in expanded mode */}
+              {calendarExpanded && (
+                <Animated.View 
+                  style={[
+                    styles.legendContainer,
+                    { opacity: calendarHeightAnim }
+                  ]}
+                >
                   <View style={styles.legendItem}>
                     <View style={[styles.legendDot, { backgroundColor: '#4ECCA3' }]} />
                     <Text style={styles.legendText}>Single Flight</Text>
@@ -813,127 +1053,69 @@ const FlightCrewApp = () => {
                     <View style={[styles.legendDot, { backgroundColor: '#FF6B6B' }]} />
                     <Text style={styles.legendText}>Day Off</Text>
                   </View>
-                </View>
-              </View>
-            </Animated.View>
-
-            {/* Today's Plan Section */}
-            <Animated.View 
-              style={[
-                styles.todaysPlanSection,
-                {
-                  opacity: fadeAnim,
-                  transform: [
-                    { translateY: slideAnim },
-                    { scale: scaleAnim }
-                  ]
-                }
-              ]}
-            >
-              <View style={styles.planHeader}>
-                <Text style={styles.planHeaderTitle}>Today's Plan</Text>
-                <TouchableOpacity>
-                  <Text style={styles.viewAllText}>view all</Text>
-                </TouchableOpacity>
-              </View>
-
-              {/* No flights message */}
-              {(!selectedDayData || selectedDayData.Duty === 'Day Off') && (
-                <Animated.View 
-                  style={[
-                    styles.noFlightsContainer,
-                    {
-                      transform: [{ scale: dateSelectionAnim }]
-                    }
-                  ]}
-                >
-                  <Text style={styles.noFlightsText}>
-                    {selectedDayData?.Duty === 'Day Off' 
-                      ? 'Day Off - Enjoy your rest!' 
-                      : 'No flight information available for this date.'}
-                  </Text>
                 </Animated.View>
               )}
+            </View>
+          </View>
+        </Animated.View>
 
-              {/* Flight Tickets */}
-              {selectedDayData && selectedDayData.Flights && (
-                <FlatList
-                  data={selectedDayData.Flights}
-                  keyExtractor={(item, index) => `flight-${item.Duty}-${index}`}
-                  renderItem={({ item, index }) => {
-                    const isConnectingFlight = index > 0;
-                    const duration = calculateDuration(item.DepTime, item.ArrivalTime);
-                    
-                    return (
-                      <Animated.View 
-                        style={[
-                          styles.flightTicket,
-                          {
-                            transform: [{ scale: dateSelectionAnim }]
-                          }
-                        ]}
-                      >
-                        {/* Origin */}
-                        <View style={styles.flightRow}>
-                          <View style={styles.flightLocation}>
-                            <Text style={styles.locationCode}>
-                              {item.Departure} {FLAGS[item.Departure] || '🏳️'}
-                            </Text>
-                            <Text style={styles.flightNumber}>{item.Duty}</Text>
-                          </View>
-                          <View style={styles.flightTime}>
-                            <Text style={styles.timeValue}>{item.DepTime}</Text>
-                          </View>
-                        </View>
+        {/* Light background section for flights */}
+        <View style={[
+          styles.flightsSection,
+          {
+            marginTop: calendarExpanded ? -100 : -140, // More overlap when collapsed
+          }
+        ]}>
+          {/* Today's Plan Section */}
+          <View style={styles.todaysPlanSection}>
+            <View style={styles.planHeader}>
+              <Text style={styles.planHeaderTitle}>Today's Plan</Text>
+              <TouchableOpacity>
+                <Text style={styles.viewAllText}>view all</Text>
+              </TouchableOpacity>
+            </View>
 
-                        {/* Flight Progress */}
-                        <View style={styles.flightProgressContainer}>
-                          <View style={styles.flightProgressLine}>
-                            <View style={styles.flightProgressDot} />
-                            <View style={styles.flightProgressBar} />
-                            <View style={styles.flightProgressDot} />
-                          </View>
-                          <Text style={styles.flightDuration}>{duration}</Text>
-                        </View>
+            {/* No flights message */}
+            {(!selectedDayData || selectedDayData.Duty === 'Day Off') && (
+              <Animated.View 
+                style={[
+                  styles.noFlightsContainer,
+                  {
+                    transform: [{ scale: dateSelectionAnim }]
+                  }
+                ]}
+              >
+                <Text style={styles.noFlightsText}>
+                  {selectedDayData?.Duty === 'Day Off' 
+                    ? 'Day Off - Enjoy your rest!' 
+                    : 'No flight information available for this date.'}
+                </Text>
+              </Animated.View>
+            )}
 
-                        {/* Destination */}
-                        <View style={styles.flightRow}>
-                          <View style={styles.flightLocation}>
-                            <Text style={styles.locationCode}>
-                              {item.Arrival} {FLAGS[item.Arrival] || '🏳️'}
-                            </Text>
-                            <View style={styles.aircraftInfo}>
-                              <Text style={styles.aircraftType}>{item.Aircraft}</Text>
-                            </View>
-                          </View>
-                          <View style={styles.flightTime}>
-                            <Text style={styles.timeValue}>{item.ArrivalTime}</Text>
-                          </View>
-                        </View>
-                        
-                        {/* Additional Flight Info */}
-                        <View style={styles.flightAdditionalInfo}>
-                          <Text style={styles.flightCrewInfo}>
-                            <Text style={styles.flightCrewLabel}>Cockpit: </Text>
-                            {item.Cockpit}
-                          </Text>
-                          <Text style={styles.flightCrewInfo}>
-                            <Text style={styles.flightCrewLabel}>Cabin: </Text>
-                            {item.Cabin}
-                          </Text>
-                        </View>
-                      </Animated.View>
-                    );
-                  }}
-                  ItemSeparatorComponent={() => <View style={styles.flightSeparator} />}
-                  scrollEnabled={false}
-                />
-              )}
-            </Animated.View>
-          </ScrollView>
+            {/* Flight Tickets */}
+            {selectedDayData && selectedDayData.Flights && (
+              <FlatList
+                data={selectedDayData.Flights}
+                keyExtractor={(item, index) => `flight-${item.Duty}-${index}`}
+                renderItem={({item, index}) => (
+                  <FlightCard 
+                    item={item} 
+                    index={index} 
+                    dateSelectionAnim={dateSelectionAnim}
+                  />
+                )}
+                ItemSeparatorComponent={() => <View style={styles.flightSeparator} />}
+                scrollEnabled={false}
+              />
+            )}
+          </View>
+          
+          {/* Bottom spacer for better scrolling */}
+          <View style={styles.bottomSpacer} />
         </View>
-      </View>
-    </>
+      </ScrollView>
+    </View>
   );
 };
 
@@ -944,34 +1126,20 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#080808',
   },
+  scrollView: {
+    flex: 1,
+  },
   topSection: {
     backgroundColor: '#080808',
-    paddingBottom: 10,
     paddingHorizontal: 20,
-    zIndex: 1,
-  },
-  topContent: {
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
-  },
-  welcomeSection: {
-    marginTop: 20,
-    marginBottom: 20,
-  },
-  welcomeTitle: {
-    fontSize: 32,
-    fontWeight: '600',
-    color: '#FFFFFF',
-  },
-  welcomeSubtitle: {
-    fontSize: 18,
-    color: 'rgba(255,255,255,0.7)',
-    marginTop: 5,
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight + 15 : 15, // Added extra top padding
   },
   headerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 10,
+    marginTop: 30, // Increased top margin to shift everything down
+    paddingVertical: 10, // Added vertical padding
   },
   iconButton: {
     width: 40,
@@ -979,7 +1147,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.1)',
   },
   dateText: {
     color: '#B6B4B4',
@@ -1005,49 +1172,63 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: 1,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    marginHorizontal: 10,
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    marginTop: 15,
   },
-  mainContent: {
-    flex: 1,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    marginTop: -20,
-    paddingTop: 20,
-    backgroundColor: '#F8F7FA',
-    overflow: 'hidden',
+  welcomeSection: {
+    marginTop: 20,
+    marginBottom: 30,
   },
-  circleOverlay: {
+  welcomeTitle: {
+    fontSize: 32,
+    fontWeight: '600',
+    color: '#FFFFFF',
+  },
+  welcomeSubtitle: {
+    fontSize: 18,
+    color: 'rgba(255,255,255,0.7)',
+    marginTop: 5,
+  },
+  // Calendar section with black background
+  calendarSection: {
+    position: 'relative',
+    backgroundColor: '#080808',
+    paddingHorizontal: 20,
+    overflow: 'visible', // Changed from 'hidden' to prevent cutoff
+    zIndex: 1,
+  },
+  // Light oval that creates the transition
+  lightOval: {
     position: 'absolute',
-    width: width * 1.5,
-    height: width * 1.5,
-    backgroundColor: '#F8F7FA', // Light background color
-    borderRadius: width * 1.5 / 2,
-    top: -width * 1.3, // Position to create arc at top
+    backgroundColor: '#F8F7FA',
     alignSelf: 'center',
+    zIndex: 1,
   },
-  scrollContent: {
-    flex: 1,
-    paddingTop: 20,
-  },
+  // Calendar container positioned on top of background
   calendarContainer: {
-    marginHorizontal: 15,
     backgroundColor: '#FFFFFF',
     borderRadius: 20,
     padding: 15,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 3,
+      height: 2,
     },
     shadowOpacity: 0.1,
-    shadowRadius: 6,
+    shadowRadius: 5,
     elevation: 5,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.8)',
+    marginTop: 20,
+    zIndex: 10,
+  },
+  // Header row with month selector and expand/collapse toggle
+  calendarHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   monthsContainer: {
     paddingVertical: 5,
+    flexGrow: 1,
   },
   monthButton: {
     paddingHorizontal: 20,
@@ -1066,31 +1247,38 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontWeight: '500',
   },
+  // Expand/collapse toggle button
+  expandToggleButton: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 10,
+  },
   calendarGrid: {
     marginTop: 15,
   },
   daysHeader: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    justifyContent: 'space-between',
     paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(0,0,0,0.05)',
+    marginBottom: 8,
   },
   dayHeaderText: {
     color: '#888',
-    fontSize: 14,
-    width: 40,
+    fontSize: 13,
     textAlign: 'center',
     fontWeight: '500',
+    width: (width - 40 - 30) / 7, // Full width minus padding divided by 7 days
   },
   datesGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-around',
-    paddingVertical: 5,
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   dateButton: {
-    width: 40,
+    width: (width - 40 - 30) / 7, // Full width minus padding divided by 7 days
     height: 40,
     justifyContent: 'center',
     alignItems: 'center',
@@ -1160,7 +1348,7 @@ const styles = StyleSheet.create({
   },
   legendContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    justifyContent: 'space-evenly',
     marginTop: 15,
     paddingTop: 10,
     borderTopWidth: 1,
@@ -1169,6 +1357,7 @@ const styles = StyleSheet.create({
   legendItem: {
     flexDirection: 'row',
     alignItems: 'center',
+    paddingHorizontal: 5,
   },
   legendDot: {
     width: 8,
@@ -1180,10 +1369,18 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#666',
   },
+  // Light background section for flights
+  flightsSection: {
+    backgroundColor: '#F8F7FA',
+    paddingHorizontal: 20,
+    paddingTop: 30,
+    paddingBottom: 20,
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    zIndex: 5, // Ensure it stays on top
+  },
   todaysPlanSection: {
-    marginTop: 25,
-    paddingHorizontal: 15,
-    marginBottom: 40,
+    marginBottom: 20,
   },
   planHeader: {
     flexDirection: 'row',
@@ -1192,18 +1389,18 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   planHeaderTitle: {
-    fontSize: 20,
+    fontSize: 28,
     fontWeight: '600',
     color: '#333',
   },
   viewAllText: {
     color: '#999',
-    fontSize: 14,
+    fontSize: 16,
   },
   flightTicket: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 15,
-    padding: 15,
+    borderRadius: 20,
+    padding: 20,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -1212,83 +1409,161 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
+    marginBottom: 15,
+  },
+  flightCardHeader: {
+    marginBottom: 15,
+  },
+  flightOriginDestination: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+  },
+  flightEndpoint: {
+    alignItems: 'center',
+    flex: 2,
+  },
+  locationName: {
+    fontSize: 24,
+    color: '#666',
+    marginBottom: 5,
+  },
+  flightTime: {
+    fontSize: 42,
+    fontWeight: '700',
+    color: '#000',
+  },
+  flightNumberContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    flex: 1,
+    paddingTop: 15,
+  },
+  flightNumberText: {
+    fontSize: 18,
+    color: '#999',
   },
   flightSeparator: {
     height: 15,
   },
-  flightRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  flightLocation: {
-    flex: 1,
-  },
-  locationCode: {
-    fontSize: 22,
-    fontWeight: '500',
-    color: '#333',
-  },
-  flightNumber: {
-    color: '#999',
-    fontSize: 14,
-    marginTop: 2,
-  },
-  flightTime: {
-    alignItems: 'flex-end',
-  },
-  timeValue: {
-    fontSize: 30,
-    fontWeight: '700',
-    color: '#333',
-  },
   flightProgressContainer: {
-    marginVertical: 15,
+    marginVertical: 20,
   },
   flightProgressLine: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 5,
+    justifyContent: 'center',
+    position: 'relative',
   },
   flightProgressDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: '#333',
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#666',
   },
   flightProgressBar: {
     flex: 1,
-    height: 2,
-    backgroundColor: '#DDD',
+    height: 1,
+    borderWidth: 1,
+    borderColor: '#CCC',
+    borderStyle: 'dashed',
     marginHorizontal: 5,
+    position: 'relative',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  airplaneIcon: {
+    width: 24,
+    height: 24,
+    position: 'absolute',
+    top: -12,
+    // No image required, rendered as text
   },
   flightDuration: {
     textAlign: 'center',
     color: '#999',
-    fontSize: 14,
+    fontSize: 16,
+    marginTop: 10,
   },
-  aircraftInfo: {
-    marginTop: 5,
+  flightCardFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  aircraftContainer: {
+    backgroundColor: '#F0F4F8',
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    borderRadius: 15,
+  },
+  aircraftLabel: {
+    fontSize: 12,
+    color: '#999',
+    marginBottom: 2,
   },
   aircraftType: {
-    fontSize: 20,
-    fontWeight: '500',
+    fontSize: 22,
+    fontWeight: '600',
     color: '#333',
   },
-  flightAdditionalInfo: {
+  crewImagesContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  crewStackedImages: {
+    flexDirection: 'row',
+    width: 80,
+    height: 40,
+    position: 'relative',
+  },
+  crewImage: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#DDD',
+    position: 'absolute',
+    borderWidth: 2,
+    borderColor: '#FFF',
+  },
+  expandIconContainer: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: '#1a237e',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 10,
+  },
+  expandIcon: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  crewDetailsContainer: {
     marginTop: 15,
     paddingTop: 15,
     borderTopWidth: 1,
     borderTopColor: '#EEE',
   },
-  flightCrewInfo: {
+  crewSection: {
+    marginBottom: 10,
+  },
+  crewSectionTitle: {
     fontSize: 14,
-    color: '#666',
+    fontWeight: '600',
+    color: '#333',
     marginBottom: 5,
   },
-  flightCrewLabel: {
-    fontWeight: '500',
-    color: '#333',
+  crewMembers: {
+    fontSize: 14,
+    color: '#666',
+    lineHeight: 20,
+  },
+  crewDivider: {
+    height: 1,
+    backgroundColor: '#EEE',
+    marginVertical: 10,
   },
   noFlightsContainer: {
     backgroundColor: '#FFFFFF',
@@ -1309,6 +1584,47 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#666',
     textAlign: 'center',
+  },
+  bottomSpacer: {
+    height: 100, // Increased for bottom tab bar
+  },
+  // Bottom Tab Bar
+  bottomTabBar: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 70,
+    backgroundColor: '#FFFFFF',
+    flexDirection: 'row',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: -2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 10,
+    borderTopWidth: 1,
+    borderTopColor: '#F0F0F0',
+  },
+  tabButton: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  activeTabButton: {
+    borderTopWidth: 3,
+    borderTopColor: '#1a237e',
+  },
+  tabButtonText: {
+    fontSize: 12,
+    color: '#999',
+    marginTop: 5,
+  },
+  activeTabButtonText: {
+    color: '#1a237e',
+    fontWeight: '500',
   },
 });
 
